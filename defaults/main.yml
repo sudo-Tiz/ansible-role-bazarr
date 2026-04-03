@@ -11,7 +11,7 @@ bazarr_gid: ''
 bazarr_timezone: 'Etc/UTC'
 
 # renovate: datasource=docker depName=lscr.io/linuxserver/bazarr versioning=semver
-bazarr_version: v1.5.6-ls342
+bazarr_version: 1.5.6
 bazarr_arch: amd64
 
 # The hostname at which bazarr is served.
