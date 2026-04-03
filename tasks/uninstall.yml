@@ -1,0 +1,26 @@
+---
+
+- name: Check existence of Bazarr systemd service
+  ansible.builtin.stat:
+    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ bazarr_identifier }}.service"
+  register: bazarr_service_stat
+
+- name: Uninstall Bazarr systemd services and files
+  when: bazarr_service_stat.stat.exists | bool
+  block:
+    - name: Ensure Bazarr systemd service is stopped
+      ansible.builtin.service:
+        name: "{{ bazarr_identifier }}"
+        state: stopped
+        enabled: false
+        daemon_reload: true
+
+    - name: Ensure Bazarr systemd service does not exist
+      ansible.builtin.file:
+        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ bazarr_identifier }}.service"
+        state: absent
+
+    - name: Ensure Bazarr path doesn't exist
+      ansible.builtin.file:
+        path: "{{ bazarr_base_path }}"
+        state: absent
