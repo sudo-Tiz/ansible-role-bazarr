@@ -1,0 +1,25 @@
+---
+
+- name: Install Bazarr
+  tags:
+    - setup-all
+    - setup-bazarr
+    - install-all
+    - install-bazarr
+  block:
+    - name: Run Bazarr validation tasks
+      when: bazarr_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
+
+    - name: Run Bazarr installation tasks
+      when: bazarr_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
+
+- name: Uninstall Bazarr
+  tags:
+    - setup-all
+    - setup-bazarr
+  block:
+    - name: Run Bazarr uninstallation tasks
+      when: not bazarr_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"

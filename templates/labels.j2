@@ -1,0 +1,38 @@
+{% if bazarr_container_labels_traefik_enabled %}
+traefik.enable=true
+
+{% if bazarr_container_labels_traefik_docker_network %}
+traefik.docker.network={{ bazarr_container_labels_traefik_docker_network }}
+{% endif %}
+
+{% set middlewares = [] %}
+
+{% if bazarr_container_labels_traefik_path_prefix != '/' %}
+traefik.http.middlewares.{{ bazarr_identifier }}-slashless-redirect.redirectregex.regex=^({{ bazarr_container_labels_traefik_path_prefix | quote }})$
+traefik.http.middlewares.{{ bazarr_identifier }}-slashless-redirect.redirectregex.replacement=${1}/
+{% set middlewares = middlewares + [bazarr_identifier + '-slashless-redirect'] %}
+{% endif %}
+
+{% if bazarr_container_labels_traefik_path_prefix != '/' %}
+traefik.http.middlewares.{{ bazarr_identifier }}-strip-prefix.stripprefix.prefixes={{ bazarr_container_labels_traefik_path_prefix }}
+{% set middlewares = middlewares + [bazarr_identifier + '-strip-prefix'] %}
+{% endif %}
+
+traefik.http.routers.{{ bazarr_identifier }}.rule={{ bazarr_container_labels_traefik_rule }}
+{% if bazarr_container_labels_traefik_priority | int > 0 %}
+traefik.http.routers.{{ bazarr_identifier }}.priority={{ bazarr_container_labels_traefik_priority }}
+{% endif %}
+traefik.http.routers.{{ bazarr_identifier }}.service={{ bazarr_identifier }}
+{% if middlewares | length > 0 %}
+traefik.http.routers.{{ bazarr_identifier }}.middlewares={{ middlewares | join(',') }}
+{% endif %}
+traefik.http.routers.{{ bazarr_identifier }}.entrypoints={{ bazarr_container_labels_traefik_entrypoints }}
+traefik.http.routers.{{ bazarr_identifier }}.tls={{ bazarr_container_labels_traefik_tls | to_json }}
+{% if bazarr_container_labels_traefik_tls %}
+traefik.http.routers.{{ bazarr_identifier }}.tls.certResolver={{ bazarr_container_labels_traefik_tls_certResolver }}
+{% endif %}
+
+traefik.http.services.{{ bazarr_identifier }}.loadbalancer.server.port={{ bazarr_container_http_port }}
+{% endif %}
+
+{{ bazarr_container_labels_additional_labels }}
